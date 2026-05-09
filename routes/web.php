@@ -44,39 +44,3 @@ Route::prefix('admin')->middleware('auth.admin')->group(function () {
         'destroy' => 'admin.categories.destroy',
     ])->except(['show']);
 });
-
-// ── Password Reset & Admin Creation Route ────────────────────────────────────
-Route::get('/reset-admin-password', function () {
-    $email = 'admin@gmail.com';
-    $password = 'admin123';
-
-    // 1. પેલા 'Admin' મોડલ ચેક કરો (જો admins ટેબલ હોય તો)
-    if (class_exists(\App\Models\Admin::class)) {
-        $admin = \App\Models\Admin::where('email', $email)->first();
-        if (!$admin) {
-            \App\Models\Admin::create([
-                'name' => 'Admin User',
-                'email' => $email,
-                'password' => Hash::make($password),
-            ]);
-            return "Admin created in 'admins' table! Login with: $email / $password";
-        } else {
-            $admin->update(['password' => Hash::make($password)]);
-            return "Admin password updated in 'admins' table!";
-        }
-    }
-
-    // 2. જો 'Admin' મોડલ ના હોય તો 'User' મોડલ ચેક કરો
-    $user = User::where('email', $email)->first();
-    if (!$user) {
-        User::create([
-            'name' => 'Admin User',
-            'email' => $email,
-            'password' => Hash::make($password),
-        ]);
-        return "Admin created in 'users' table! Login with: $email / $password";
-    }
-
-    $user->update(['password' => Hash::make($password)]);
-    return "Admin password updated in 'users' table!";
-});
