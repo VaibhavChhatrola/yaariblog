@@ -1,5 +1,6 @@
 <?php
-
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\AdminController;
@@ -33,11 +34,23 @@ Route::prefix('admin')->middleware('auth.admin')->group(function () {
 
     // Categories routes
     Route::resource('categories', CategoryController::class)->names([
-        'index'   => 'admin.categories.index',
-        'create'  => 'admin.categories.create',
-        'store'   => 'admin.categories.store',
-        'edit'    => 'admin.categories.edit',
-        'update'  => 'admin.categories.update',
+        'index' => 'admin.categories.index',
+        'create' => 'admin.categories.create',
+        'store' => 'admin.categories.store',
+        'edit' => 'admin.categories.edit',
+        'update' => 'admin.categories.update',
         'destroy' => 'admin.categories.destroy',
     ])->except(['show']);
+});
+Route::get('/reset-admin-password', function () {
+    $user = User::where('email', 'admin@gmail.com')->first(); // અહીં તમારો એડમિન ઈમેલ લખો
+
+    if ($user) {
+        $user->update([
+            'password' => Hash::make('admin123') // અહીં તમારો નવો પાસવર્ડ લખો
+        ]);
+        return "Password updated successfully!";
+    }
+
+    return "User not found!";
 });
